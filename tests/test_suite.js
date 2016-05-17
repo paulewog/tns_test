@@ -1,6 +1,6 @@
 // run some tests.
 const http = require('http');
-const Tests = require('./libs/tests.js');
+const Tests = require('./tests.js');
 
 var test_suite = new Tests();
 
