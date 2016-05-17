@@ -37,12 +37,12 @@ routing.get('/', function(args) {
   if(!auth.authenticate(null, null, args.token))
   { error_response("You are not logged in.", 401, args.response); }
   message_response("Hi!", 200, args.response);
-})
+});
 
 // Setup the credential related routes.
 routing.post('/login', function(args) {
   write_response(auth.login(args.data.email, args.data.password), null, args.response);
-})
+});
 
 routing.post('/logout', function(args) {
   if(!auth.authenticate(null, null, args.token))
