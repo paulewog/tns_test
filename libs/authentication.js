@@ -9,9 +9,7 @@ Authentication.prototype.users = {
     name: 'Admin User',
     password: crypto.createHash('sha256', 'changeme').digest('hex'),
     lastLoggedIn: null,
-
-    // an API token.  hard-coded here for ease of test/dev.
-    token: 'b5964ee71c760ad8d87dd0e86e721ea2f5f1e17d9ada4b2b3b29ed809f03d462bd6bf483e8e8ea605082318bd2bbeaccb3bdf5372e1377559b5c627ffb784b96'
+    token: ''
   },
 
   'testuser@example.com': {
