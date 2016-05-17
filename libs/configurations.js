@@ -1,22 +1,17 @@
 var Configurations = function() {};
 
 // we will pretend that the row id is the ID for now.
-Configurations.prototype.configurations = [
-  {
-    "id" : 1,
-    "name" : "host1",
-    "hostname" : "nessus-ntp.lab.com",
-    "port" : 1241,
-    "username" : "toto"
-  },
-  {
-    "id" : 2,
-    "name" : "host2",
-    "hostname" : "nessus-xml.lab.com",
-    "port" : 3384,
-    "username" : "admin"
+Configurations.prototype.configurations = [];
+for(var i=0; i<100; i++) {
+  conf = {
+    "id": i,
+    "name": `host${i}`,
+    "hostname": `my_host_${i}.example.com`,
+    "port": 1000+i,
+    "username": `user${i}`
   }
-];
+  Configurations.prototype.configurations.push(conf);
+}
 
 Configurations.prototype._get = function(id) {
   for(var i in this.configurations) {
@@ -64,7 +59,7 @@ Configurations.prototype.index = function(args) {
   // TODO: Change this to some sort of database.
   var start = 0
   var limit = parseInt(args.limit) || 10;
-  if("page" in args) start = parseInt(args.page) * limit;
+  if("page" in args) start = (parseInt(args.page)-1) * limit;
   var end = start + limit;
 
   // sort by id by default.
@@ -87,20 +82,23 @@ Configurations.prototype.index = function(args) {
 };
 
 Configurations.prototype.create = function(args) {
-  return this.configurations.append(args.data);
+  args.data.id = this.configurations.length;
+  this.configurations.push(args.data);
+  return this._get(args.data.id);
 };
 
 Configurations.prototype.show = function(args) {
-  console.log(args);
   return this._get(args.id);
 };
 
 Configurations.prototype.update = function(args) {
-  var conf = this.get(args.id);
-  for(i in Object.keys(args.changes))
+  var conf = this._get(args.id);
+  if(!conf) { return null; }
+  for(i in Object.keys(conf))
   {
-    var key = Object.keys(args.changes)[i];
-    conf[key] = args.changes[key];
+    var key = Object.keys(conf)[i];
+    if(key in args.data)
+    { conf[key] = args.data[key]; }
   }
   this._save(conf);
   return this._get(args.id);

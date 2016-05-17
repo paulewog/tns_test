@@ -76,7 +76,7 @@ Authentication.prototype.login = function(email, password) {
       // ... this would depend on how we would want to do user security... e.g.,
       // a token based security like this, where the token is inserted into
       // the header on subsequent calls, or use sessions to store the login information.
-      if(!user.lastLoggedIn || Date.now() > user.lastLoggedIn + (60 * 60 * 24))
+      if(user.token == '' || !user.lastLoggedIn || Date.now() > user.lastLoggedIn + (60 * 60 * 24))
       {
         const buf = crypto.randomBytes(64);
         user.token = buf.toString('hex');

@@ -129,7 +129,10 @@ Router.prototype.process = function(req, data) {
   var url_stuff = url.parse(req.url);
   var verb = req.method;
   var route = url_stuff.pathname;
-  var args = querystring.parse(url_stuff.search.substr(1));
+  var args = {};
+  if(url_stuff.search && url_stuff.search.length > 0 ) {
+    args = querystring.parse(url_stuff.search.substr(1));
+  }
   args.token = req.headers.authorization;
   args.data = data;
 
