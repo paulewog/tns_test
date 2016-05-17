@@ -24,7 +24,7 @@ function rest_request(verb, route, payload, headers, callback) {
       res.on('end', () => {
         response = Buffer.concat(chunks).toString();
         try { response = JSON.parse(response); } catch(e) { }
-        callback(response);
+        callback(response, res.statusCode);
       });
     }
   );
@@ -38,6 +38,18 @@ function rest_request(verb, route, payload, headers, callback) {
   req.end();
 }
 
+function assert(val1, msg) {
+  if(!val1) { test_suite.post_execute({failed: true, error: `Expected ${val1} to not be null/false/undefined.  ${msg}`}); }
+}
+
+function assert_equal(val1, val2, msg) {
+  if(val1 != val2) { test_suite.post_execute({failed: true, error: `Expected ${val1} == ${val2}.  ${msg}`}); }
+}
+
+function assert_not_equal(val1, val2, msg) {
+  if(val1 == val2) { test_suite.post_execute({failed: true, error: `Expected ${val1} != ${val2}.  ${msg}`}); }
+}
+
 function error(rv, msg) {
   rv.failed = true;
   rv.error = msg;
@@ -45,7 +57,7 @@ function error(rv, msg) {
 };
 
 // make sure we require a login.
-test_suite.test("Login required test", function(done) {
+test_suite.test("Login required", function(done) {
   var rv = { failed: false }
   var result = rest_request("GET", "/", null, null, (result) => {
     if(!result) {
@@ -62,7 +74,7 @@ test_suite.test("Login required test", function(done) {
 // we will store this for future tests.
 var headers = {};
 
-test_suite.test("Login test", function(done) {
+test_suite.test("Login", function(done) {
   var rv = { failed: false }
   var result = rest_request("POST", "/login", {email: "admin@example.com", password: "changeme"}, null, (result) => {
     if(!result) {
@@ -76,7 +88,7 @@ test_suite.test("Login test", function(done) {
   });
 });
 
-test_suite.test("Logged in test", function(done) {
+test_suite.test("Logged in", function(done) {
   var rv = { failed: false }
   var result = rest_request("GET", "/", null, headers, (result) => {
     if(!result) {
@@ -89,7 +101,7 @@ test_suite.test("Logged in test", function(done) {
   });
 });
 
-test_suite.test("Logout test", function(done) {
+test_suite.test("Logout", function(done) {
   var rv = { failed: false }
   var result = rest_request("POST", "/logout", {}, headers, (result) => {
     if(!result) {
@@ -128,7 +140,7 @@ test_suite.test("Getting configurations should require login", function(done) {
   });
 });
 
-test_suite.test("Login ... again ... test", function(done) {
+test_suite.test("Login ... again ...", function(done) {
   var rv = { failed: false }
   var result = rest_request("POST", "/login", {email: "admin@example.com", password: "changeme"}, null, (result) => {
     if(!result) {
@@ -142,7 +154,7 @@ test_suite.test("Login ... again ... test", function(done) {
   });
 });
 
-test_suite.test("List configurations, defaulting to 10 test", function(done) {
+test_suite.test("List configurations, defaulting to 10", function(done) {
   var rv = { failed: false }
   var result = rest_request("GET", "/configurations", null, headers, (result) => {
     if(!result) {
@@ -177,6 +189,32 @@ test_suite.test("List configurations 5 per page, page 2", function(done) {
       done(error(rv, "Response did not have 20 configurations."));
     } else if(result[0].id != 5) {
       done(error(rv, `Response did not start with ID number 5, it was ${result[0].id}.`));
+    } else {
+      done(rv);
+    }
+  });
+});
+
+test_suite.test("Get configuration that does not exist", function(done) {
+  var rv = { failed: false }
+  var result = rest_request("GET", "/configurations/abcdef", null, headers, (result, status) => {
+    if(!result) {
+      done(error(rv, "Response was null"));
+    } else if(status != 404) {
+      done(error(rv, "Response status code was not 404"));
+    } else {
+      done(rv);
+    }
+  });
+});
+
+test_suite.test("Go to a route that does not exist", function(done) {
+  var rv = { failed: false }
+  var result = rest_request("GET", "/i_definitely_do_not_exist", null, headers, (result, status) => {
+    if(!result) {
+      done(error(rv, "Response was null"));
+    } else if(status != 404) {
+      done(error(rv, "Response status code was not 404"));
     } else {
       done(rv);
     }

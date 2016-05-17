@@ -88,27 +88,27 @@ Router.prototype.put = function(route, callback) {
 Router.prototype.resources = function(route_basis, object, pre_callback, post_callback) {
  this.new('GET', route_basis, function(args) {
    pre_callback(args);
-   post_callback(object.index(args));
+   post_callback(args, object.index(args));
  });
 
  this.new('GET', route_basis + "/:id", function(args) {
    pre_callback(args);
-   post_callback(object.show(args));
+   post_callback(args, object.show(args));
  });
 
  this.new('POST', route_basis, function(args) {
    pre_callback(args);
-   post_callback(object.create(args));
+   post_callback(args, object.create(args));
  });
 
  this.new('PUT', route_basis + "/:id", function(args) {
    pre_callback(args);
-   post_callback(object.update(args));
+   post_callback(args, object.update(args));
  });
 
  this.new('DELETE', route_basis + "/:id", function(args) {
    pre_callback(args);
-   post_callback(object.destroy(args));
+   post_callback(args, object.destroy(args));
  });
 };
 
@@ -125,7 +125,7 @@ Router.prototype.return_possible_routes = function(base_route) {
   return possibilities;
 }
 
-Router.prototype.process = function(req, data) {
+Router.prototype.process = function(req, data, res) {
   var url_stuff = url.parse(req.url);
   var verb = req.method;
   var route = url_stuff.pathname;
@@ -133,11 +133,12 @@ Router.prototype.process = function(req, data) {
   if(url_stuff.search && url_stuff.search.length > 0 ) {
     args = querystring.parse(url_stuff.search.substr(1));
   }
+  args.response = res;
   args.token = req.headers.authorization;
   args.data = data;
 
   if(! (verb in this.routes)) {
-    this.error("The route " + route + " was not found.", 404)
+    this.error("The route " + route + " was not found.", 404, res)
   } else {
     // TODO: This doesn't really do what I would consider correct ordering
     // of the route lookups.
@@ -202,7 +203,7 @@ Router.prototype.process = function(req, data) {
     }
 
     if(!the_route) {
-      this.error("The route " + route + " was not found.", 404)
+      this.error("The route " + route + " was not found.", 404, res)
     }
     else {
       the_route.callback(args);
