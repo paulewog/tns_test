@@ -12,6 +12,8 @@ var auth = new Authentication();
 
 // just some helper functions for writing things
 // to the browser in JSON format.
+// Right now, even though we accept a format (e.g. /route.json), we
+// are always returning JSON...
 function message_response(message, statusNumber, res) {
   if(!statusNumber) statusNumber = 200;
   write_response({message: message}, statusNumber, res);

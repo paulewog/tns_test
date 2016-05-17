@@ -13,6 +13,7 @@ for(var i=0; i<100; i++) {
   Configurations.prototype.configurations.push(conf);
 }
 
+// _get(): get a configuration by ID
 Configurations.prototype._get = function(id) {
   for(var i in this.configurations) {
     if(this.configurations[i].id == id)
@@ -21,6 +22,7 @@ Configurations.prototype._get = function(id) {
   return null;
 };
 
+// _save(): save the passed configuration
 Configurations.prototype._save = function(conf) {
   for(var i in this.configurations) {
     if(this.configurations[i].id == conf.id)
@@ -29,6 +31,7 @@ Configurations.prototype._save = function(conf) {
   return null;
 };
 
+// _delete(): delete a configuration by ID (and return it)
 Configurations.prototype._delete = function(id) {
   var conf = null; var position = -1;
   for(var i in this.configurations) {
@@ -42,17 +45,23 @@ Configurations.prototype._delete = function(id) {
   return conf;
 };
 
+// _map(): return an array of hashes with just the given field, and index,
+// for sorting purposes.
 Configurations.prototype._map = function(field) {
   return this.configurations.map(function(c, i) {
     return { index: i, value: c[field] }
   });
 };
 
+// _expand(): the opposite of _map() basically.
 Configurations.prototype._expand = function(mapped) {
   var confs = this.configurations;
   return mapped.map(function(x) { return confs[x.index]; });
 };
 
+// index(options): return an index of all the configurations.
+// supports a few options.. page, limit (number per page), sort (the field
+// to sort on), and ascending (order)
 Configurations.prototype.index = function(args) {
   if(!args) args = {};
 
@@ -81,16 +90,19 @@ Configurations.prototype.index = function(args) {
   );
 };
 
+// create(): create a new configuration
 Configurations.prototype.create = function(args) {
   args.data.id = this.configurations.length;
   this.configurations.push(args.data);
   return this._get(args.data.id);
 };
 
+// show(): show a specific configuration
 Configurations.prototype.show = function(args) {
   return this._get(args.id);
 };
 
+// update(): update a configuration with the provided changes
 Configurations.prototype.update = function(args) {
   var conf = this._get(args.id);
   if(!conf) { return null; }

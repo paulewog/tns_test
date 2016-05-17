@@ -3,7 +3,7 @@ var Authentication = function() {};
 const crypto = require('crypto');
 const hash = crypto.createHash('sha256');
 
-// for mockup purposes, create some users.
+// for mockup purposes, create some users and just use this hash as the "database"
 Authentication.prototype.users = {
   'admin@example.com': {
     name: 'Admin User',
@@ -22,6 +22,7 @@ Authentication.prototype.users = {
   }
 };
 
+// user_by_token(): returns a user ... by the token.  fancy that!
 Authentication.prototype.user_by_token = function(token) {
   if(!token)
   { return null; }
