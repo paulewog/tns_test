@@ -10,7 +10,7 @@ Tests.prototype.stats = {
   passed: 0,
   failed: 0,
   failures: []
-}
+};
 
 Tests.prototype.post_execute = function(result) {
   var tc = this.tests[this.stats.current];

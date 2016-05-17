@@ -19,7 +19,7 @@ Configurations.prototype._get = function(id) {
     { return this.configurations[i]; }
   }
   return null;
-}
+};
 
 Configurations.prototype._save = function(conf) {
   for(var i in this.configurations) {
@@ -51,7 +51,7 @@ Configurations.prototype._map = function(field) {
 Configurations.prototype._expand = function(mapped) {
   var confs = this.configurations;
   return mapped.map(function(x) { return confs[x.index]; });
-}
+};
 
 Configurations.prototype.index = function(args) {
   if(!args) args = {};

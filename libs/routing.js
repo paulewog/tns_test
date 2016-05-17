@@ -47,7 +47,7 @@ var Router = function(error_callback) {
 
 Router.prototype.error = function(message) {
   console.error("Error callback was not configured.  Error: " + message);
-}
+};
 Router.prototype.routes = {};
 Router.prototype.new = function(verb, route, callback) {
   verb = verb.toUpperCase();
@@ -62,23 +62,23 @@ Router.prototype.new = function(verb, route, callback) {
   };
 
   return this.routes[verb][route];
-}
+};
 
 Router.prototype.post = function(route, callback) {
   return this.new('POST', route, callback);
-}
+};
 
 Router.prototype.get = function(route, callback) {
   return this.new('GET', route, callback);
-}
+};
 
 Router.prototype.delete = function(route, callback) {
   return this.new('DELETE', route, callback);
-}
+};
 
 Router.prototype.put = function(route, callback) {
   return this.new('PUT', route, callback);
-}
+};
 
 // provide a way to quickly do a default (e.g., write out the JSON) function
 // for all four default verbs and functions:
@@ -125,7 +125,7 @@ Router.prototype.return_possible_routes = function(base_route) {
   }
 
   return possibilities;
-}
+};
 
 Router.prototype.process = function(req, data, res) {
   var url_stuff = url.parse(req.url);
@@ -217,6 +217,6 @@ Router.prototype.process = function(req, data, res) {
       the_route.callback(args);
     }
   }
-}
+};
 
 module.exports = Router;
