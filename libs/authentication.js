@@ -22,6 +22,19 @@ Authentication.prototype.users = {
   }
 };
 
+Authentication.prototype.user_by_token = function(token) {
+  if(!token)
+  { return null; }
+
+  for(var i in this.users) {
+    var user = this.users[i];
+    if(user.token == token)
+    { return user; }
+  }
+
+  return null;
+}
+
 // authenticate(): returns true for successful authentication, false if not.
 Authentication.prototype.authenticate = function(email, password, token) {
   var user = this.users[email];
@@ -30,11 +43,9 @@ Authentication.prototype.authenticate = function(email, password, token) {
   else if(user && token && user.token == token)
   { return true; }
   else if(token) {
-    for(var i in this.users) {
-      var user = this.users[i];
-      if(user.token == token)
-      { return true; }
-    }
+    var user = this.user_by_token(token);
+    if(user && user.token == token)
+    { return true; }
   }
 
   return false;
@@ -85,16 +96,16 @@ Authentication.prototype.login = function(email, password) {
 
 // logout(): returns a hash:
 // { success: true/false, message: string
-Authentication.prototype.logout = function(email, token) {
+Authentication.prototype.logout = function(token) {
   // need to make sure they are authenticated so you can't just randomly logout anyone.
   var returnValue = { success: false, message: "Not authenticated." };
-  var user = this.users[email];
+  user = this.user_by_token(token);
   if(!user) {
-    returnValue.message = "Invalid user.";
+    returnValue.message = "Invalid user or user is not logged in.";
     return returnValue;
-  } else if(this.authenticate(email, null, token)) {
+  } else if(this.authenticate(null, null, token)) {
     // logout.
-    this.user.token = '';
+    user.token = '';
     returnValue.success = true;
     returnValue.message = "You have been logged out.";
     return returnValue;

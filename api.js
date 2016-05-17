@@ -2,8 +2,11 @@
 fs = require('fs');
 http = require('http');
 url = require('url');
+const Configurations = require('./libs/configurations.js');
 const Router = require('./libs/routing.js');
 const Authentication = require('./libs/authentication.js');
+
+var configurations = new Configurations();
 var routing = new Router();
 var auth = new Authentication();
 
@@ -30,19 +33,42 @@ http.createServer(function (req, res) {
   // to the router as well.
   routing.error = error_response;
 
-  routing.post('/login', function(args) {
-    write_response(auth.login(args.data.email, args.data.password));
-  })
-
-  routing.delete('/logout', function(args) {
-    write_response(auth.logout(args.data.email));
-  });
-
-  routing.get('/hello', function(args) {
+  // Setup a default / route.
+  routing.get('/', function(args) {
     if(!auth.authenticate(null, null, args.token))
     { error_response("You are not logged in."); }
     message_response("Hello world!");
   })
+
+  // Setup the credential related routes.
+  routing.post('/login', function(args) {
+    write_response(auth.login(args.data.email, args.data.password));
+  })
+
+  routing.post('/logout', function(args) {
+    write_response(auth.logout(args.token));
+  });
+
+  // Setup resources routes for /configurations
+  routing.get('/configurations', function(args) {
+    if(!auth.authenticate(null, null, args.token))
+    { error_response("You are not logged in."); }
+
+    write_response(configurations.index());
+  });
+
+  routing.resources(
+    "/configurations",
+    configurations,
+    function(args) {
+      if(!auth.authenticate(null, null, args.token))
+      { error_response("You are not logged in."); }
+    },
+    function(output) {
+      if(output) { write_response(output); }
+      else { error_response ("Configuration not found", 404); }
+    }
+  );
 
 
   // get the request data
