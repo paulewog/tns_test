@@ -4,7 +4,7 @@
     var router = new Router(optional_error_handling_function);
 
   You can specify new routes using:
-    router.post("/myroute", function myCallbackFunction(arguments) {} )
+    router.post("/myroute", function myCallbackFunction(stuff) {} )
     router.get(...)
     router.delete(...)
     router.put(...)
@@ -13,6 +13,7 @@
 
   The object looks like this:
   {
+    response: the http request response which can be used to write a response back,
     query_string_key: "query_string_value from, e.g., ?query_string_key=query_string_value",
     [...]
     data:  { this is a JSON parsed object from the request payload/body },
@@ -24,6 +25,7 @@
     headers with an Authorization field value of "ABCD", and a matching route of "/test/:id",
     the object would look something like this:
   {
+    response: [Object object],
     data: {
       hi: "there",
     },
@@ -129,6 +131,12 @@ Router.prototype.process = function(req, data, res) {
   var url_stuff = url.parse(req.url);
   var verb = req.method;
   var route = url_stuff.pathname;
+  var format = "json";
+  if(route.indexOf(".") != -1) {
+    var s = route.split(".", 2);
+    route = s[0];
+    format = s[1];
+  }
   var args = {};
   if(url_stuff.search && url_stuff.search.length > 0 ) {
     args = querystring.parse(url_stuff.search.substr(1));
@@ -141,7 +149,7 @@ Router.prototype.process = function(req, data, res) {
     this.error("The route " + route + " was not found.", 404, res)
   } else {
     // TODO: This doesn't really do what I would consider correct ordering
-    // of the route lookups.
+    // or priority of the route lookups.
     // We need to find the route... it could be an exact match, but otherwise,
     // we need to search through each route that has a keyword matching in it,
     // such as /configurations/:id.

@@ -59,7 +59,7 @@ Configurations.prototype.index = function(args) {
   // TODO: Change this to some sort of database.
   var start = 0
   var limit = parseInt(args.limit) || 10;
-  if("page" in args) start = (parseInt(args.page)-1) * limit;
+  if("page" in args && args.page > 0) start = (parseInt(args.page)-1) * limit;
   var end = start + limit;
 
   // sort by id by default.

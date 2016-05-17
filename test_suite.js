@@ -186,9 +186,37 @@ test_suite.test("List configurations 5 per page, page 2", function(done) {
     if(!result) {
       done(error(rv, "Response was null"));
     } else if(result.length != 5) {
-      done(error(rv, "Response did not have 20 configurations."));
+      done(error(rv, "Response did not have 5 configurations."));
     } else if(result[0].id != 5) {
       done(error(rv, `Response did not start with ID number 5, it was ${result[0].id}.`));
+    } else {
+      done(rv);
+    }
+  });
+});
+
+test_suite.test("List configurations 5 per page, page -1", function(done) {
+  var rv = { failed: false }
+  var result = rest_request("GET", "/configurations?limit=5&page=-1", null, headers, (result) => {
+    if(!result) {
+      done(error(rv, "Response was null"));
+    } else if(result.length != 5) {
+      done(error(rv, "Response did not have 5 configurations."));
+    } else if(result[0].id != 0) {
+      done(error(rv, `Response did not start with ID number 0, it was ${result[0].id}.`));
+    } else {
+      done(rv);
+    }
+  });
+});
+
+test_suite.test("List configurations 100 per page, page 3", function(done) {
+  var rv = { failed: false }
+  var result = rest_request("GET", "/configurations?limit=100&page=3", null, headers, (result) => {
+    if(!result) {
+      done(error(rv, "Response was null"));
+    } else if(result.length != 0) {
+      done(error(rv, "Response did not have 0 configurations."));
     } else {
       done(rv);
     }
@@ -202,6 +230,19 @@ test_suite.test("Get configuration that does not exist", function(done) {
       done(error(rv, "Response was null"));
     } else if(status != 404) {
       done(error(rv, "Response status code was not 404"));
+    } else {
+      done(rv);
+    }
+  });
+});
+
+test_suite.test("Get configuration with the format included", function(done) {
+  var rv = { failed: false }
+  var result = rest_request("GET", "/configurations/1.json", null, headers, (result, status) => {
+    if(!result) {
+      done(error(rv, "Response was null"));
+    } else if(status != 200) {
+      done(error(rv, "Response status code was not 200"));
     } else {
       done(rv);
     }
@@ -308,7 +349,7 @@ test_suite.test("Delete a configuration", function(done) {
   var step1 = function(rv) {
     var result = rest_request(
       "DELETE",
-      "/configurations/1",
+      "/configurations/100",
       null,
       headers,
       (result) => {
@@ -534,7 +575,7 @@ test_suite.test("Sort by port", function(done) {
   step1(rv);
 });
 
-test_suite.test("Sort by port", function(done) {
+test_suite.test("Sort by port descending", function(done) {
   var rv = { failed: false }
 
   var step1 = function(rv) {
